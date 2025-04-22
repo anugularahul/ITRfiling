@@ -7,13 +7,14 @@ st.title("📄 ITR Form Selector")
 st.write("Answer the questions below to get a suggestion on which ITR form you should file.")
 
 # --- Input Fields ---
-resident = st.radio("Are you a Resident Indian?", ["Yes", "No"])
-salary_income = st.radio("Do you have Salary Income?", ["Yes", "No"])
-business_income = st.radio("Do you have Business or Professional Income?", ["Yes", "No"])
-presumptive_scheme = st.radio("Are you using Presumptive Income Scheme (44AD/44ADA/44AE)?", ["Yes", "No"])
-capital_gains = st.radio("Do you have Capital Gains?", ["Yes", "No"])
-foreign_assets = st.radio("Do you have Foreign Assets or Foreign Income?", ["Yes", "No"])
-multiple_properties = st.radio("Do you own more than one house property?", ["Yes", "No"])
+resident = st.radio("Are you a Resident Indian?", ["-- Select --", "Yes", "No"])
+salary_income = st.radio("Do you have Salary Income?", ["-- Select --", "Yes", "No"])
+business_income = st.radio("Do you have Business or Professional Income?", ["-- Select --", "Yes", "No"])
+presumptive_scheme = st.radio("Are you using Presumptive Income Scheme (44AD/44ADA/44AE)?", ["-- Select --", "Yes", "No"])
+capital_gains = st.radio("Do you have Capital Gains?", ["-- Select --", "Yes", "No"])
+foreign_assets = st.radio("Do you have Foreign Assets or Foreign Income?", ["-- Select --", "Yes", "No"])
+multiple_properties = st.radio("Do you own more than one house property?", ["-- Select --", "Yes", "No"])
+
 total_income = st.number_input("Enter your total income (in ₹):", min_value=0)
 
 # --- Logic Function ---
@@ -81,7 +82,7 @@ if st.button("Suggest ITR Form"):
     # --- Download Link ---
     with open(filename, "rb") as file:
         st.download_button(
-            label="📥 Download PDF Summary",
+            label="📥 Download ",
             data=file,
             file_name=filename,
             mime="application/pdf"
