@@ -1,10 +1,9 @@
 import streamlit as st
-from datetime import datetime
 
 st.set_page_config(page_title="ITR Suggestion App", layout="centered")
-
 st.title("📄 ITR Form & Plan Suggestion App")
 
+# Input fields
 name = st.text_input("Full Name")
 email = st.text_input("Email Address")
 phone = st.text_input("Phone Number")
@@ -25,8 +24,9 @@ trust = st.radio("Is your income from a trust or political party?", ["Yes", "No"
 
 total_income = st.number_input("Enter your total income (in ₹)", min_value=0, step=1000)
 
+# Suggest ITR and Plan
 def suggest_itr_and_plan():
-    # ITR form logic
+    # ITR Form Logic
     if trust == "Yes":
         itr_form = "ITR-7"
     elif company == "Yes":
@@ -50,7 +50,7 @@ def suggest_itr_and_plan():
     else:
         itr_form = "More details needed."
 
-    # Plan logic with Luxury and corrected Basic condition
+    # Plan Logic
     if itr_form in ["ITR-5", "ITR-6", "ITR-7"]:
         plan = "Assisted Filing Luxury"
     elif total_income > 5000000 or foreign_assets == "Yes" or business_income == "Yes" or freelancer == "Yes":
@@ -60,20 +60,16 @@ def suggest_itr_and_plan():
     elif capital_gains == "Yes" or multi_property == "Yes":
         plan = "Assisted Filing Premium"
     else:
-        plan = "Assisted Filing Premium"  # Default fallback plan
+        plan = "Assisted Filing Premium"
 
     return itr_form, plan
 
-
+# Submit Button
 if st.button("📤 Submit & Get Suggestion"):
     if name and email and phone:
         itr_form, filing_plan = suggest_itr_and_plan()
-        st.success(f"✅ You should file: **{itr_form}**")
-        
-        if filing_plan == "Assisted Filing Luxury":
-            st.info(f"📦 Recommended Plan: **{filing_plan}** - For ITR-5, ITR-6, ITR-7 filers.\n\nAdditional Benefits:\n- Assisted Filing Black services.\n- CA available for video calls throughout the year for any tax needs, doubts, Q&A, JTBD services, and tax planning.")
-        else:
-            st.info(f"📦 Recommended Plan: **{filing_plan}**")
 
+        st.success(f"✅ You should file: **{itr_form}**")
+        st.info(f"📦 Recommended Plan: **{filing_plan}**")
     else:
         st.error("❗ Please enter Name, Email, and Phone.")
