@@ -61,7 +61,6 @@ def suggest_itr():
             return "ITR-1 (Sahaj)"
     return "More details needed."
 
-# --- PDF Export ---
 def create_pdf(data, suggestion):
     pdf = FPDF()
     pdf.add_page()
@@ -77,8 +76,9 @@ def create_pdf(data, suggestion):
     pdf.cell(200, 10, txt=f"Suggested ITR Form: {suggestion}", ln=True)
 
     filename = f"itr_summary_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
-    pdf.output(filename.encode("latin1"))
+    pdf.output(filename)
     return filename
+
 
 # --- Process Submission ---
 if submitted:
