@@ -5,35 +5,28 @@ import os
 
 st.set_page_config(page_title="ITR Suggestion App", layout="centered")
 
-# Title
 st.title("📄 ITR Form & Plan Suggestion App")
-st.markdown("Provide your details and get the best ITR form and plan recommendation.")
-
-# Input fields
-st.header("🔍 Personal and Financial Information")
 
 name = st.text_input("Full Name")
 email = st.text_input("Email Address")
 phone = st.text_input("Phone Number")
 
-salary_income = st.radio("Do you have salary income?", ["Yes", "No"], key="salary_income")
-salary_above_50 = st.radio("Is your salary income above ₹50 lakh?", ["Yes", "No"], key="salary_above_50")
+salary_income = st.radio("Do you have salary income?", ["Yes", "No"])
+salary_above_50 = st.radio("Is your salary income above ₹50 lakh?", ["Yes", "No"])
 
-capital_gains = st.radio("Do you have capital gains (Crypto, FnO, etc)?", ["Yes", "No"], key="capital_gains")
-business_income = st.radio("Do you have business income?", ["Yes", "No"], key="business_income")
-freelancer = st.radio("Are you a freelancer?", ["Yes", "No"], key="freelancer")
-presumptive = st.radio("Are you under presumptive taxation?", ["Yes", "No"], key="presumptive")
+capital_gains = st.radio("Do you have capital gains (Crypto, FnO, etc)?", ["Yes", "No"])
+business_income = st.radio("Do you have business income?", ["Yes", "No"])
+freelancer = st.radio("Are you a freelancer?", ["Yes", "No"])
+presumptive = st.radio("Are you under presumptive taxation?", ["Yes", "No"])
 
-foreign_assets = st.radio("Do you have foreign income or foreign assets?", ["Yes", "No"], key="foreign_assets")
-multi_property = st.radio("Do you own more than one house property?", ["Yes", "No"], key="multi_property")
-firm_type = st.radio("Are you a partner in a firm (excluding LLP)?", ["Yes", "No"], key="firm_type")
-company = st.radio("Is your income from a company?", ["Yes", "No"], key="company")
-trust = st.radio("Is your income from a trust or political party?", ["Yes", "No"], key="trust")
+foreign_assets = st.radio("Do you have foreign income or foreign assets?", ["Yes", "No"])
+multi_property = st.radio("Do you own more than one house property?", ["Yes", "No"])
+firm_type = st.radio("Are you a partner in a firm (excluding LLP)?", ["Yes", "No"])
+company = st.radio("Is your income from a company?", ["Yes", "No"])
+trust = st.radio("Is your income from a trust or political party?", ["Yes", "No"])
 
-total_income = st.number_input("Enter your total income (in ₹)", min_value=0, step=1000, key="total_income")
+total_income = st.number_input("Enter your total income (in ₹)", min_value=0, step=1000)
 
-
-# Suggestion logic
 def suggest_itr_and_plan():
     if trust == "Yes":
         itr_form = "ITR-7"
@@ -58,14 +51,9 @@ def suggest_itr_and_plan():
     else:
         itr_form = "More details needed."
 
-    # Filing Plan Suggestion
-    has_capital_gains = capital_gains == "Yes"
-    has_foreign_income = foreign_assets == "Yes"
-    is_business = business_income == "Yes" or freelancer == "Yes"
-
-    if total_income > 5000000 or has_foreign_income or is_business:
+    if total_income > 5000000 or foreign_assets == "Yes" or business_income == "Yes" or freelancer == "Yes":
         plan = "Assisted Filing Black"
-    elif has_capital_gains or multi_property == "Yes":
+    elif capital_gains == "Yes" or multi_property == "Yes":
         plan = "Assisted Filing Premium"
     elif salary_income == "Yes" and total_income <= 5000000:
         plan = "Assisted Filing Basic"
@@ -74,29 +62,34 @@ def suggest_itr_and_plan():
 
     return itr_form, plan
 
-
-# PDF generation using Unicode-safe font
 class PDF(FPDF):
     def header(self):
-        self.set_font("Arial", "B", 14)
-        self.cell(200, 10, txt="ITR Suggestion Report", ln=1, align="C")
-        self.set_font("Arial", size=10)
-        self.cell(200, 10, txt=f"Generated on {datetime.now().strftime('%d-%m-%Y %H:%M:%S')}", ln=1, align="C")
+        self.set_font("DejaVu", size=14)
+        self.cell(200, 10, txt="📋 ITR Suggestion Report", ln=True, align="C")
+        self.set_font("DejaVu", size=10)
+        self.cell(200, 10, txt=f"Generated on {datetime.now().strftime('%d-%m-%Y %H:%M:%S')}", ln=True, align="C")
         self.ln(10)
 
     def body(self, data_dict):
-        self.set_font("Arial", size=12)
+        self.set_font("DejaVu", size=12)
         for key, value in data_dict.items():
-            self.cell(200, 10, txt=f"{key}: {value}", ln=1)
+            self.cell(0, 10, txt=f"{key}: {value}", ln=True)
 
+# Register Unicode font
+def create_pdf(user_data, file_name):
+    pdf = PDF()
+    pdf.add_font("DejaVu", "", "DejaVuSans.ttf", uni=True)
+    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.add_page()
+    pdf.body(user_data)
+    pdf.output(file_name)
 
 if st.button("📤 Submit & Get Suggestion"):
     if name and email and phone:
         itr_form, filing_plan = suggest_itr_and_plan()
-        st.success(f"✅ Based on your inputs, you should file: **{itr_form}**")
-        st.info(f"📦 Recommended ITR Filing Plan: **{filing_plan}**")
+        st.success(f"✅ You should file: **{itr_form}**")
+        st.info(f"📦 Recommended Plan: **{filing_plan}**")
 
-        # Prepare data
         user_data = {
             "Name": name,
             "Email": email,
@@ -111,23 +104,18 @@ if st.button("📤 Submit & Get Suggestion"):
             "Multiple Properties": multi_property,
             "Firm Partner": firm_type,
             "Company Income": company,
-            "Trust/Political Income": trust,
+            "Trust Income": trust,
             "Total Income": f"₹{total_income:,}",
             "Recommended ITR Form": itr_form,
             "Recommended Plan": filing_plan
         }
 
-        # Create PDF
-        pdf = PDF()
-        pdf.add_page()
-        pdf.body(user_data)
-        pdf_output_path = "itr_suggestion_report.pdf"
-        pdf.output(pdf_output_path)
+        pdf_path = "itr_report.pdf"
+        create_pdf(user_data, pdf_path)
 
-        with open(pdf_output_path, "rb") as f:
-            st.download_button("📄 Download Your ITR Suggestion Report", f, file_name="ITR_Suggestion_Report.pdf")
+        with open(pdf_path, "rb") as f:
+            st.download_button("📄 Download ITR Report", f, file_name="ITR_Suggestion_Report.pdf")
 
-        # Clean up
-        os.remove(pdf_output_path)
+        os.remove(pdf_path)
     else:
-        st.error("❗ Please fill in all required fields (Name, Email, Phone).")
+        st.error("❗ Please enter Name, Email, and Phone.")
