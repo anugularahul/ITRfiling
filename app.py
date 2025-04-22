@@ -55,7 +55,7 @@ def suggest_itr_and_plan():
         plan = "Assisted Filing Luxury"
     elif total_income > 5000000 or foreign_assets == "Yes" or business_income == "Yes" or freelancer == "Yes":
         plan = "Assisted Filing Black"
-    elif salary_income == "Yes" and total_income <= 5000000:
+    elif salary_income == "Yes" and total_income < 5000000:
         plan = "Assisted Filing Basic"
     elif capital_gains == "Yes" or multi_property == "Yes":
         plan = "Assisted Filing Premium"
