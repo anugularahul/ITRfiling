@@ -2,7 +2,7 @@ import streamlit as st
 from fpdf import FPDF
 import datetime
 
-st.set_page_config(page_title="ITR Selector", layout="centered")
+st.set_page_config(page_title="Best ITR to choose", layout="centered")
 st.title("📄 ITR Form Selector")
 st.write("Answer the questions below to get a suggestion on which ITR form you should file.")
 
