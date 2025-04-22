@@ -9,9 +9,6 @@ name = st.text_input("Full Name")
 email = st.text_input("Email Address")
 phone = st.text_input("Phone Number")
 
-# New field: Role for "Assisted Filing Luxury"
-role = st.selectbox("Are you a CEO, CXO, or VP?", ["No", "Yes"])
-
 salary_income = st.radio("Do you have salary income?", ["Yes", "No"])
 salary_above_50 = st.radio("Is your salary income above ₹50 lakh?", ["Yes", "No"])
 
@@ -53,8 +50,8 @@ def suggest_itr_and_plan():
     else:
         itr_form = "More details needed."
 
-    # Plan logic with added "Assisted Filing Luxury" for CEOs, CXOs, and VPs
-    if role == "Yes":  # If the user is a CEO, CXO, or VP
+    # Plan logic with updated "Luxury" plan for ITR-5, ITR-6, ITR-7
+    if itr_form in ["ITR-5", "ITR-6", "ITR-7"]:
         plan = "Assisted Filing Luxury"
     elif total_income > 5000000 or foreign_assets == "Yes" or business_income == "Yes" or freelancer == "Yes":
         plan = "Assisted Filing Black"
@@ -73,7 +70,7 @@ if st.button("📤 Submit & Get Suggestion"):
         st.success(f"✅ You should file: **{itr_form}**")
         
         if filing_plan == "Assisted Filing Luxury":
-            st.info(f"📦 Recommended Plan: **{filing_plan}** - For CEOs, CXOs, and VPs.\n\nAdditional Benefits:\n- Assisted Filing Black services.\n- CA available for video calls throughout the year for any tax needs, doubts, Q&A, JTBD services, and tax planning.")
+            st.info(f"📦 Recommended Plan: **{filing_plan}** - For ITR-5, ITR-6, ITR-7 filers.\n\nAdditional Benefits:\n- Assisted Filing Black services.\n- CA available for video calls throughout the year for any tax needs, doubts, Q&A, JTBD services, and tax planning.")
         else:
             st.info(f"📦 Recommended Plan: **{filing_plan}**")
 
