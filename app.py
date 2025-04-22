@@ -50,19 +50,20 @@ def suggest_itr_and_plan():
     else:
         itr_form = "More details needed."
 
-    # Plan logic with updated "Luxury" plan for ITR-5, ITR-6, ITR-7
+    # Plan logic with Luxury and corrected Basic condition
     if itr_form in ["ITR-5", "ITR-6", "ITR-7"]:
         plan = "Assisted Filing Luxury"
     elif total_income > 5000000 or foreign_assets == "Yes" or business_income == "Yes" or freelancer == "Yes":
         plan = "Assisted Filing Black"
-    elif capital_gains == "Yes" or multi_property == "Yes":
-        plan = "Assisted Filing Premium"
     elif salary_income == "Yes" and total_income <= 5000000:
         plan = "Assisted Filing Basic"
+    elif capital_gains == "Yes" or multi_property == "Yes":
+        plan = "Assisted Filing Premium"
     else:
         plan = "Assisted Filing Premium"  # Default fallback plan
 
     return itr_form, plan
+
 
 if st.button("📤 Submit & Get Suggestion"):
     if name and email and phone:
