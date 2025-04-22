@@ -3,7 +3,7 @@ from fpdf import FPDF
 import datetime
 
 st.set_page_config(page_title="Best ITR to choose", layout="centered")
-st.title("📄 ITR Form Selector")
+st.title("📄 Best ITR to choose")
 st.write("Answer the questions below to get a suggestion on which ITR form you should file.")
 
 # --- Initialize session state ---
