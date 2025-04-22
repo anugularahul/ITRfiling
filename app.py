@@ -6,18 +6,40 @@ st.set_page_config(page_title="ITR Selector", layout="centered")
 st.title("📄 ITR Form Selector")
 st.write("Answer the questions below to get a suggestion on which ITR form you should file.")
 
-# --- Input Fields ---
-resident = st.radio("Are you a Resident Indian?", ["-- Select --", "Yes", "No"])
-salary_income = st.radio("Do you have Salary Income?", ["-- Select --", "Yes", "No"])
-business_income = st.radio("Do you have Business or Professional Income?", ["-- Select --", "Yes", "No"])
-presumptive_scheme = st.radio("Are you using Presumptive Income Scheme (44AD/44ADA/44AE)?", ["-- Select --", "Yes", "No"])
-capital_gains = st.radio("Do you have Capital Gains?", ["-- Select --", "Yes", "No"])
-foreign_assets = st.radio("Do you have Foreign Assets or Foreign Income?", ["-- Select --", "Yes", "No"])
-multiple_properties = st.radio("Do you own more than one house property?", ["-- Select --", "Yes", "No"])
+# --- Initialize session state ---
+if "clear" not in st.session_state:
+    st.session_state.clear_trigger = False
 
-total_income = st.number_input("Enter your total income (in ₹):", min_value=0)
+# --- Function to clear all inputs ---
+def clear_inputs():
+    st.session_state.resident = "-- Select --"
+    st.session_state.salary_income = "-- Select --"
+    st.session_state.business_income = "-- Select --"
+    st.session_state.presumptive_scheme = "-- Select --"
+    st.session_state.capital_gains = "-- Select --"
+    st.session_state.foreign_assets = "-- Select --"
+    st.session_state.multiple_properties = "-- Select --"
+    st.session_state.total_income = 0
+    st.session_state.clear_trigger = True
 
-# --- Logic Function ---
+# --- Input Fields with default unselected ---
+resident = st.radio("Are you a Resident Indian?", ["-- Select --", "Yes", "No"],
+                    key="resident")
+salary_income = st.radio("Do you have Salary Income?", ["-- Select --", "Yes", "No"],
+                         key="salary_income")
+business_income = st.radio("Do you have Business or Professional Income?", ["-- Select --", "Yes", "No"],
+                           key="business_income")
+presumptive_scheme = st.radio("Are you using Presumptive Income Scheme (44AD/44ADA/44AE)?", ["-- Select --", "Yes", "No"],
+                              key="presumptive_scheme")
+capital_gains = st.radio("Do you have Capital Gains?", ["-- Select --", "Yes", "No"],
+                         key="capital_gains")
+foreign_assets = st.radio("Do you have Foreign Assets or Foreign Income?", ["-- Select --", "Yes", "No"],
+                          key="foreign_assets")
+multiple_properties = st.radio("Do you own more than one house property?", ["-- Select --", "Yes", "No"],
+                               key="multiple_properties")
+total_income = st.number_input("Enter your total income (in ₹):", min_value=0, key="total_income")
+
+# --- Suggestion Logic ---
 def suggest_itr(resident, salary_income, business_income, presumptive_scheme,
                 capital_gains, foreign_assets, multiple_properties, total_income):
 
@@ -38,7 +60,7 @@ def suggest_itr(resident, salary_income, business_income, presumptive_scheme,
 
     return "More details needed to determine the right ITR."
 
-# --- PDF Export Function ---
+# --- PDF Creation ---
 def create_pdf(data, suggestion):
     pdf = FPDF()
     pdf.add_page()
@@ -57,33 +79,40 @@ def create_pdf(data, suggestion):
     pdf.output(filename)
     return filename
 
-# --- Result Button ---
-if st.button("Suggest ITR Form"):
-    suggestion = suggest_itr(resident, salary_income, business_income, presumptive_scheme,
-                             capital_gains, foreign_assets, multiple_properties, total_income)
-    
-    st.success(f"✅ Based on your inputs, you should file: **{suggestion}**")
+# --- Buttons ---
+col1, col2 = st.columns([1, 1])
+with col1:
+    if st.button("Suggest ITR Form"):
+        if "-- Select --" in [resident, salary_income, business_income, presumptive_scheme,
+                              capital_gains, foreign_assets, multiple_properties]:
+            st.error("⚠️ Please answer all questions before proceeding.")
+        else:
+            suggestion = suggest_itr(resident, salary_income, business_income, presumptive_scheme,
+                                     capital_gains, foreign_assets, multiple_properties, total_income)
+            
+            st.success(f"✅ Based on your inputs, you should file: **{suggestion}**")
 
-    # --- Summary Dictionary ---
-    user_data = {
-        "Resident Indian": resident,
-        "Salary Income": salary_income,
-        "Business Income": business_income,
-        "Presumptive Scheme": presumptive_scheme,
-        "Capital Gains": capital_gains,
-        "Foreign Assets/Income": foreign_assets,
-        "Owns Multiple Properties": multiple_properties,
-        "Total Income": f"Rs. {total_income}" 
-    }
+            user_data = {
+                "Resident Indian": resident,
+                "Salary Income": salary_income,
+                "Business Income": business_income,
+                "Presumptive Scheme": presumptive_scheme,
+                "Capital Gains": capital_gains,
+                "Foreign Assets/Income": foreign_assets,
+                "Owns Multiple Properties": multiple_properties,
+                "Total Income": f"Rs. {total_income}" 
+            }
 
-    # --- PDF Creation ---
-    filename = create_pdf(user_data, suggestion)
+            filename = create_pdf(user_data, suggestion)
 
-    # --- Download Link ---
-    with open(filename, "rb") as file:
-        st.download_button(
-            label="📥 Download ",
-            data=file,
-            file_name=filename,
-            mime="application/pdf"
-        )
+            with open(filename, "rb") as file:
+                st.download_button(
+                    label="📥 Download",
+                    data=file,
+                    file_name=filename,
+                    mime="application/pdf"
+                )
+
+with col2:
+    if st.button("Clear Responses"):
+        clear_inputs()
