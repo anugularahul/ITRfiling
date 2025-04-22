@@ -26,6 +26,7 @@ with st.form("itr_form"):
     salary_income = st.radio("Do you have Salary Income?", ["Yes", "No"], key="salary_income")
     salary_above_50 = st.radio("Is your Salary above ₹50 lakhs?", ["Yes", "No", "N/A"], key="salary_above_50")
     business_income = st.radio("Do you have Business or Professional Income?", ["Yes", "No"], key="business_income")
+    freelancer = st.radio("Are you a Freelancer?", ["Yes", "No"], key="freelancer")
     presumptive_scheme = st.radio("Are you using Presumptive Income Scheme (44AD/44ADA/44AE)?", ["Yes", "No"], key="presumptive")
     capital_gains = st.radio("Do you have Capital Gains?", ["Yes", "No"], key="capital_gains")
     foreign_assets = st.radio("Do you have Foreign Assets or Foreign Income?", ["Yes", "No"], key="foreign_assets")
@@ -48,7 +49,7 @@ def suggest_itr():
         return "ITR-6"
     if st.session_state.firm_type == "Yes":
         return "ITR-5"
-    if st.session_state.business_income == "Yes":
+    if st.session_state.business_income == "Yes" or st.session_state.freelancer == "Yes":
         if st.session_state.presumptive == "Yes" and st.session_state.total_income <= 5000000:
             return "ITR-4 (Sugam)"
         return "ITR-3"
@@ -61,6 +62,7 @@ def suggest_itr():
             return "ITR-1 (Sahaj)"
     return "More details needed."
 
+# --- PDF Creation Function ---
 def create_pdf(data, suggestion):
     pdf = FPDF()
     pdf.add_page()
@@ -69,7 +71,8 @@ def create_pdf(data, suggestion):
     pdf.ln(10)
 
     for key, value in data.items():
-        pdf.cell(200, 10, txt=f"{key}: {value}", ln=True)
+        line = f"{key}: {value}"
+        pdf.cell(200, 10, txt=line.encode('latin-1', 'replace').decode('latin-1'), ln=True)
 
     pdf.ln(10)
     pdf.set_font("Arial", "B", 12)
@@ -78,7 +81,6 @@ def create_pdf(data, suggestion):
     filename = f"itr_summary_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
     pdf.output(filename)
     return filename
-
 
 # --- Process Submission ---
 if submitted:
@@ -91,6 +93,7 @@ if submitted:
         "Salary Income": salary_income,
         "Salary above ₹50L": salary_above_50,
         "Business Income": business_income,
+        "Freelancer": freelancer,
         "Presumptive Income": presumptive_scheme,
         "Capital Gains": capital_gains,
         "Foreign Assets/Income": foreign_assets,
