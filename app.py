@@ -1,9 +1,10 @@
 import streamlit as st
+from datetime import datetime
 
 st.set_page_config(page_title="ITR Suggestion App", layout="centered")
 st.title("📄 ITR Form & Plan Suggestion App")
 
-# Input fields
+# User Inputs
 name = st.text_input("Full Name")
 email = st.text_input("Email Address")
 phone = st.text_input("Phone Number")
@@ -24,52 +25,55 @@ trust = st.radio("Is your income from a trust or political party?", ["Yes", "No"
 
 total_income = st.number_input("Enter your total income (in ₹)", min_value=0, step=1000)
 
-# Suggest ITR and Plan
-def suggest_itr_and_plan():
-    # ITR Form Logic
+# Logic Functions
+def suggest_itr_form():
     if trust == "Yes":
-        itr_form = "ITR-7"
+        return "ITR-7"
     elif company == "Yes":
-        itr_form = "ITR-6"
+        return "ITR-6"
     elif firm_type == "Yes":
-        itr_form = "ITR-5"
+        return "ITR-5"
     elif business_income == "Yes" or freelancer == "Yes":
         if presumptive == "Yes" and total_income <= 5000000:
-            itr_form = "ITR-4 (Sugam)"
+            return "ITR-4 (Sugam)"
         else:
-            itr_form = "ITR-3"
+            return "ITR-3"
     elif capital_gains == "Yes" or foreign_assets == "Yes" or multi_property == "Yes":
-        itr_form = "ITR-2"
+        return "ITR-2"
     elif salary_income == "Yes":
         if salary_above_50 == "Yes":
-            itr_form = "ITR-2"
-        elif salary_above_50 == "No" and multi_property == "No":
-            itr_form = "ITR-1 (Sahaj)"
+            return "ITR-2"
+        elif multi_property == "No":
+            return "ITR-1 (Sahaj)"
         else:
-            itr_form = "ITR-2"
+            return "ITR-2"
     else:
-        itr_form = "More details needed."
+        return "More details needed."
 
-    # Plan Logic
+def suggest_plan(itr_form):
+    # BLACK Plan logic
+    if total_income > 5000000:
+        return "Assisted Filing Black"
+
+    # LUXURY Plan logic
     if itr_form in ["ITR-5", "ITR-6", "ITR-7"]:
-        plan = "Assisted Filing Luxury"
-    elif total_income > 5000000 or foreign_assets == "Yes" or business_income == "Yes" or freelancer == "Yes":
-        plan = "Assisted Filing Black"
-    elif salary_income == "Yes" and total_income <= 5000000:
-        plan = "Assisted Filing Premium"
-    elif capital_gains == "Yes" or multi_property == "Yes":
-        plan = "Assisted Filing Basic"
-    else:
-        plan = "Assisted Filing Basic"
+        return "Assisted Filing Luxury"
 
-    return itr_form, plan
+    # BASIC Plan logic
+    if (salary_income == "Yes" and salary_above_50 == "No" and multi_property == "No"):
+        return "Assisted Filing Basic"
+
+    # PREMIUM Plan as default
+    return "Assisted Filing Premium"
 
 # Submit Button
 if st.button("📤 Submit & Get Suggestion"):
     if name and email and phone:
-        itr_form, filing_plan = suggest_itr_and_plan()
+        itr_form = suggest_itr_form()
+        plan = suggest_plan(itr_form)
 
         st.success(f"✅ You should file: **{itr_form}**")
-        st.info(f"📦 Recommended Plan: **{filing_plan}**")
+        st.info(f"📦 Recommended Plan: **{plan}**")
+
     else:
         st.error("❗ Please enter Name, Email, and Phone.")
