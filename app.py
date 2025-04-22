@@ -72,7 +72,7 @@ if st.button("Suggest ITR Form"):
         "Capital Gains": capital_gains,
         "Foreign Assets/Income": foreign_assets,
         "Owns Multiple Properties": multiple_properties,
-        "Total Income": f"₹{total_income}"
+        ""Total Income": f"Rs. {total_income}"  # Use ASCII-safe currency symbol
     }
 
     # --- PDF Creation ---
