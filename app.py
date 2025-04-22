@@ -32,54 +32,71 @@ trust = st.radio("Is your income from a trust or political party?", ["Yes", "No"
 
 total_income = st.number_input("Enter your total income (in ₹)", min_value=0, step=1000, key="total_income")
 
+
 # Suggestion logic
 def suggest_itr_and_plan():
-    if st.session_state.trust == "Yes":
+    if trust == "Yes":
         itr_form = "ITR-7"
-    elif st.session_state.company == "Yes":
+    elif company == "Yes":
         itr_form = "ITR-6"
-    elif st.session_state.firm_type == "Yes":
+    elif firm_type == "Yes":
         itr_form = "ITR-5"
-    elif st.session_state.business_income == "Yes" or st.session_state.freelancer == "Yes":
-        if st.session_state.presumptive == "Yes" and st.session_state.total_income <= 5000000:
+    elif business_income == "Yes" or freelancer == "Yes":
+        if presumptive == "Yes" and total_income <= 5000000:
             itr_form = "ITR-4 (Sugam)"
         else:
             itr_form = "ITR-3"
-    elif st.session_state.capital_gains == "Yes" or st.session_state.foreign_assets == "Yes" or st.session_state.multi_property == "Yes":
+    elif capital_gains == "Yes" or foreign_assets == "Yes" or multi_property == "Yes":
         itr_form = "ITR-2"
-    elif st.session_state.salary_income == "Yes":
-        if st.session_state.salary_above_50 == "Yes":
+    elif salary_income == "Yes":
+        if salary_above_50 == "Yes":
             itr_form = "ITR-2"
-        elif st.session_state.salary_above_50 == "No" and st.session_state.multi_property == "No":
+        elif salary_above_50 == "No" and multi_property == "No":
             itr_form = "ITR-1 (Sahaj)"
         else:
             itr_form = "ITR-2"
     else:
         itr_form = "More details needed."
 
-    income = st.session_state.total_income
-    has_capital_gains = st.session_state.capital_gains == "Yes"
-    has_foreign_income = st.session_state.foreign_assets == "Yes"
-    is_business = st.session_state.business_income == "Yes" or st.session_state.freelancer == "Yes"
+    # Filing Plan Suggestion
+    has_capital_gains = capital_gains == "Yes"
+    has_foreign_income = foreign_assets == "Yes"
+    is_business = business_income == "Yes" or freelancer == "Yes"
 
-    if income > 5000000 or has_foreign_income or is_business:
+    if total_income > 5000000 or has_foreign_income or is_business:
         plan = "Assisted Filing Black"
-    elif has_capital_gains or st.session_state.multi_property == "Yes":
+    elif has_capital_gains or multi_property == "Yes":
         plan = "Assisted Filing Premium"
-    elif st.session_state.salary_income == "Yes" and income <= 5000000:
+    elif salary_income == "Yes" and total_income <= 5000000:
         plan = "Assisted Filing Basic"
     else:
         plan = "Assisted Filing Premium"
 
     return itr_form, plan
 
-# Button
+
+# PDF generation using Unicode-safe font
+class PDF(FPDF):
+    def header(self):
+        self.set_font("Arial", "B", 14)
+        self.cell(200, 10, txt="ITR Suggestion Report", ln=1, align="C")
+        self.set_font("Arial", size=10)
+        self.cell(200, 10, txt=f"Generated on {datetime.now().strftime('%d-%m-%Y %H:%M:%S')}", ln=1, align="C")
+        self.ln(10)
+
+    def body(self, data_dict):
+        self.set_font("Arial", size=12)
+        for key, value in data_dict.items():
+            self.cell(200, 10, txt=f"{key}: {value}", ln=1)
+
+
 if st.button("📤 Submit & Get Suggestion"):
     if name and email and phone:
         itr_form, filing_plan = suggest_itr_and_plan()
         st.success(f"✅ Based on your inputs, you should file: **{itr_form}**")
         st.info(f"📦 Recommended ITR Filing Plan: **{filing_plan}**")
 
+        # Prepare data
         user_data = {
             "Name": name,
             "Email": email,
@@ -100,29 +117,17 @@ if st.button("📤 Submit & Get Suggestion"):
             "Recommended Plan": filing_plan
         }
 
-        # Custom PDF with Unicode font
-        class PDF(FPDF):
-            def header(self):
-                self.set_font("DejaVu", "B", 14)
-                self.cell(0, 10, "ITR Suggestion Report", ln=True, align="C")
-                self.set_font("DejaVu", "", 10)
-                self.cell(0, 10, datetime.now().strftime("%d-%m-%Y %H:%M:%S"), ln=True, align="C")
-                self.ln(10)
-
+        # Create PDF
         pdf = PDF()
         pdf.add_page()
-        pdf.add_font("DejaVu", "", "DejaVuSans.ttf", uni=True)
-        pdf.add_font("DejaVu", "B", "DejaVuSans-Bold.ttf", uni=True)
-        pdf.set_font("DejaVu", size=12)
+        pdf.body(user_data)
+        pdf_output_path = "itr_suggestion_report.pdf"
+        pdf.output(pdf_output_path)
 
-        for key, value in user_data.items():
-            pdf.cell(0, 10, f"{key}: {value}", ln=True)
-
-        pdf_output = "itr_suggestion.pdf"
-        pdf.output(pdf_output)
-
-        with open(pdf_output, "rb") as f:
+        with open(pdf_output_path, "rb") as f:
             st.download_button("📄 Download Your ITR Suggestion Report", f, file_name="ITR_Suggestion_Report.pdf")
 
+        # Clean up
+        os.remove(pdf_output_path)
     else:
         st.error("❗ Please fill in all required fields (Name, Email, Phone).")
