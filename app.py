@@ -1,6 +1,7 @@
 import streamlit as st
 from fpdf import FPDF
 from datetime import datetime
+import os
 
 st.set_page_config(page_title="ITR Suggestion App", layout="centered")
 
@@ -56,7 +57,6 @@ def suggest_itr_and_plan():
     else:
         itr_form = "More details needed."
 
-    # Filing Plan Suggestion
     income = st.session_state.total_income
     has_capital_gains = st.session_state.capital_gains == "Yes"
     has_foreign_income = st.session_state.foreign_assets == "Yes"
@@ -73,14 +73,13 @@ def suggest_itr_and_plan():
 
     return itr_form, plan
 
-# Button to process
+# Button
 if st.button("📤 Submit & Get Suggestion"):
     if name and email and phone:
         itr_form, filing_plan = suggest_itr_and_plan()
         st.success(f"✅ Based on your inputs, you should file: **{itr_form}**")
         st.info(f"📦 Recommended ITR Filing Plan: **{filing_plan}**")
 
-        # Collect data for PDF
         user_data = {
             "Name": name,
             "Email": email,
@@ -101,16 +100,23 @@ if st.button("📤 Submit & Get Suggestion"):
             "Recommended Plan": filing_plan
         }
 
-        # PDF Generation
-        pdf = FPDF()
+        # Custom PDF with Unicode font
+        class PDF(FPDF):
+            def header(self):
+                self.set_font("DejaVu", "B", 14)
+                self.cell(0, 10, "ITR Suggestion Report", ln=True, align="C")
+                self.set_font("DejaVu", "", 10)
+                self.cell(0, 10, datetime.now().strftime("%d-%m-%Y %H:%M:%S"), ln=True, align="C")
+                self.ln(10)
+
+        pdf = PDF()
         pdf.add_page()
-        pdf.set_font("Arial", size=12)
-        pdf.cell(200, 10, txt="ITR Suggestion Report", ln=1, align="C")
-        pdf.cell(200, 10, txt=f"Generated on {datetime.now().strftime('%d-%m-%Y %H:%M:%S')}", ln=1, align="C")
-        pdf.ln(10)
+        pdf.add_font("DejaVu", "", "DejaVuSans.ttf", uni=True)
+        pdf.add_font("DejaVu", "B", "DejaVuSans-Bold.ttf", uni=True)
+        pdf.set_font("DejaVu", size=12)
 
         for key, value in user_data.items():
-            pdf.cell(200, 10, txt=f"{key}: {value}", ln=1)
+            pdf.cell(0, 10, f"{key}: {value}", ln=True)
 
         pdf_output = "itr_suggestion.pdf"
         pdf.output(pdf_output)
