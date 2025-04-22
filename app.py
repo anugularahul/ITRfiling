@@ -22,19 +22,20 @@ def reset_form():
 with st.form("itr_form"):
     st.subheader("👤 Personal & Income Information")
 
-    resident = st.radio("Are you a Resident Indian?", ["Yes", "No"], key="resident")
-    salary_income = st.radio("Do you have Salary Income?", ["Yes", "No"], key="salary_income")
-    salary_above_50 = st.radio("Is your Salary above ₹50 lakhs?", ["Yes", "No", "N/A"], key="salary_above_50")
-    business_income = st.radio("Do you have Business or Professional Income?", ["Yes", "No"], key="business_income")
-    freelancer = st.radio("Are you a Freelancer?", ["Yes", "No"], key="freelancer")
-    presumptive_scheme = st.radio("Are you using Presumptive Income Scheme (44AD/44ADA/44AE)?", ["Yes", "No"], key="presumptive")
-    capital_gains = st.radio("Do you have Capital Gains?", ["Yes", "No"], key="capital_gains")
-    foreign_assets = st.radio("Do you have Foreign Assets or Foreign Income?", ["Yes", "No"], key="foreign_assets")
-    multiple_properties = st.radio("Do you own more than one house property?", ["Yes", "No"], key="multi_property")
-    income_from_firm = st.radio("Do you have income as a partner in a firm?", ["Yes", "No"], key="partner_income")
-    firm_type = st.radio("Are you filing for a Partnership Firm / LLP / AOP / BOI?", ["Yes", "No"], key="firm_type")
-    company = st.radio("Are you filing for a company?", ["Yes", "No"], key="company")
-    trust_income = st.radio("Are you filing for a trust, institution, or political party?", ["Yes", "No"], key="trust")
+    resident = st.radio("Are you a Resident Indian?", ["-- Select --", "Yes", "No"], key="resident")
+salary_income = st.radio("Do you have Salary Income?", ["-- Select --", "Yes", "No"], key="salary_income")
+salary_above_50 = st.radio("Is your Salary above ₹50 lakhs?", ["-- Select --", "Yes", "No", "N/A"], key="salary_above_50")
+business_income = st.radio("Do you have Business or Professional Income?", ["-- Select --", "Yes", "No"], key="business_income")
+freelancer = st.radio("Are you a Freelancer?", ["-- Select --", "Yes", "No"], key="freelancer")
+presumptive_scheme = st.radio("Are you using Presumptive Income Scheme (44AD/44ADA/44AE)?", ["-- Select --", "Yes", "No"], key="presumptive")
+capital_gains = st.radio("Do you have Capital Gains?", ["-- Select --", "Yes", "No"], key="capital_gains")
+foreign_assets = st.radio("Do you have Foreign Assets or Foreign Income?", ["-- Select --", "Yes", "No"], key="foreign_assets")
+multiple_properties = st.radio("Do you own more than one house property?", ["-- Select --", "Yes", "No"], key="multi_property")
+income_from_firm = st.radio("Do you have income as a partner in a firm?", ["-- Select --", "Yes", "No"], key="partner_income")
+firm_type = st.radio("Are you filing for a Partnership Firm / LLP / AOP / BOI?", ["-- Select --", "Yes", "No"], key="firm_type")
+company = st.radio("Are you filing for a company?", ["-- Select --", "Yes", "No"], key="company")
+trust_income = st.radio("Are you filing for a trust, institution, or political party?", ["-- Select --", "Yes", "No"], key="trust")
+
 
     total_income = st.number_input("Enter your Total Income (in ₹):", min_value=0, key="total_income")
 
