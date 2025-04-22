@@ -1,7 +1,5 @@
 import streamlit as st
-from fpdf import FPDF
 from datetime import datetime
-import os
 
 st.set_page_config(page_title="ITR Suggestion App", layout="centered")
 
@@ -62,60 +60,10 @@ def suggest_itr_and_plan():
 
     return itr_form, plan
 
-class PDF(FPDF):
-    def header(self):
-        self.set_font("DejaVu", size=14)
-        self.cell(200, 10, txt="📋 ITR Suggestion Report", ln=True, align="C")
-        self.set_font("DejaVu", size=10)
-        self.cell(200, 10, txt=f"Generated on {datetime.now().strftime('%d-%m-%Y %H:%M:%S')}", ln=True, align="C")
-        self.ln(10)
-
-    def body(self, data_dict):
-        self.set_font("DejaVu", size=12)
-        for key, value in data_dict.items():
-            self.cell(0, 10, txt=f"{key}: {value}", ln=True)
-
-# Register Unicode font
-def create_pdf(user_data, file_name):
-    pdf = PDF()
-    pdf.add_font("DejaVu", "", "DejaVuSans.ttf", uni=True)
-    pdf.set_auto_page_break(auto=True, margin=15)
-    pdf.add_page()
-    pdf.body(user_data)
-    pdf.output(file_name)
-
 if st.button("📤 Submit & Get Suggestion"):
     if name and email and phone:
         itr_form, filing_plan = suggest_itr_and_plan()
         st.success(f"✅ You should file: **{itr_form}**")
         st.info(f"📦 Recommended Plan: **{filing_plan}**")
-
-        user_data = {
-            "Name": name,
-            "Email": email,
-            "Phone": phone,
-            "Salary Income": salary_income,
-            "Salary > ₹50L": salary_above_50,
-            "Capital Gains": capital_gains,
-            "Business Income": business_income,
-            "Freelancer": freelancer,
-            "Presumptive Taxation": presumptive,
-            "Foreign Assets/Income": foreign_assets,
-            "Multiple Properties": multi_property,
-            "Firm Partner": firm_type,
-            "Company Income": company,
-            "Trust Income": trust,
-            "Total Income": f"₹{total_income:,}",
-            "Recommended ITR Form": itr_form,
-            "Recommended Plan": filing_plan
-        }
-
-        pdf_path = "itr_report.pdf"
-        create_pdf(user_data, pdf_path)
-
-        with open(pdf_path, "rb") as f:
-            st.download_button("📄 Download ITR Report", f, file_name="ITR_Suggestion_Report.pdf")
-
-        os.remove(pdf_path)
     else:
         st.error("❗ Please enter Name, Email, and Phone.")
