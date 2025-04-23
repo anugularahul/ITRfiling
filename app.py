@@ -4,7 +4,6 @@ st.set_page_config(page_title="ITR Suggestion App", layout="centered")
 st.title("📄 ITR Form & Plan Suggestion App")
 
 # User Inputs
-residency_status = st.radio("Are you an NRI or Indian?", ["Indian", "NRI"])
 salary_income = st.radio("Do you have salary income?", ["Yes", "No"])
 salary_above_50 = st.radio("Is your salary income above ₹50 lakh?", ["Yes", "No"])
 
@@ -18,7 +17,8 @@ firm_type = st.radio("Are you a partner in a firm (excluding LLP)?", ["Yes", "No
 company = st.radio("Is your income from a company?", ["Yes", "No"])
 trust = st.radio("Is your income from a trust or political party?", ["Yes", "No"])
 
-esop_rsu = st.radio("Do you have any ESOPs or RSUs (held or sold)?", ["Yes", "No"])
+nri_status = st.radio("Are you an NRI?", ["Yes", "No"])
+esops_or_rsus = st.radio("Do you hold or have sold ESOPs or RSUs?", ["Yes", "No"])
 
 total_income = st.number_input("Enter your total income (in ₹)", min_value=0, step=1000)
 
@@ -35,7 +35,7 @@ def suggest_itr_form():
             return "ITR-4 (Sugam)"
         else:
             return "ITR-3"
-    elif capital_gains == "Yes" or foreign_assets == "Yes" or multi_property == "Yes" or esop_rsu == "Yes":
+    elif capital_gains == "Yes" or foreign_assets == "Yes" or multi_property == "Yes":
         return "ITR-2"
     elif salary_income == "Yes":
         if salary_above_50 == "Yes":
@@ -48,24 +48,20 @@ def suggest_itr_form():
         return "More details needed."
 
 def suggest_plan(itr_form):
-    # If NRI, always go for BLACK plan
-    if residency_status == "NRI":
-        return "Assisted Filing Black"
+    # Black Plan
+    if nri_status == "Yes" or esops_or_rsus == "Yes" or foreign_assets == "Yes" or (business_income == "Yes" and presumptive == "No"):
+        return "Black"
 
-    # BLACK Plan logic
-    if foreign_assets == "Yes":
-        return "Assisted Filing Black"
+    # Premium Plan
+    if capital_gains == "Yes" or business_income == "Yes" or salary_above_50 == "Yes" or multi_property == "Yes":
+        return "Premium"
 
-    # LUXURY Plan logic
-    if itr_form in ["ITR-5", "ITR-6", "ITR-7"]:
-        return "Assisted Filing Luxury"
+    # Basic Plan
+    if salary_income == "Yes" and salary_above_50 == "No" and multi_property == "No" and business_income == "No":
+        return "Basic"
 
-    # BASIC Plan logic
-    if (salary_income == "Yes" and salary_above_50 == "No" and multi_property == "No" and business_income == "No"):
-        return "Assisted Filing Basic"
-
-    # PREMIUM Plan as default
-    return "Assisted Filing Premium"
+    # Default fallback
+    return "Premium"
 
 # Submit Button
 if st.button("📤 Submit & Get Suggestion"):
