@@ -1,14 +1,9 @@
 import streamlit as st
-from datetime import datetime
 
 st.set_page_config(page_title="ITR Suggestion App", layout="centered")
 st.title("📄 ITR Form & Plan Suggestion App")
 
 # User Inputs
-name = st.text_input("Full Name")
-email = st.text_input("Email Address")
-phone = st.text_input("Phone Number")
-
 salary_income = st.radio("Do you have salary income?", ["Yes", "No"])
 salary_above_50 = st.radio("Is your salary income above ₹50 lakh?", ["Yes", "No"])
 
@@ -68,12 +63,8 @@ def suggest_plan(itr_form):
 
 # Submit Button
 if st.button("📤 Submit & Get Suggestion"):
-    if name and email and phone:
-        itr_form = suggest_itr_form()
-        plan = suggest_plan(itr_form)
+    itr_form = suggest_itr_form()
+    plan = suggest_plan(itr_form)
 
-        st.success(f"✅ You should file: **{itr_form}**")
-        st.info(f"📦 Recommended Plan: **{plan}**")
-
-    else:
-        st.error("❗ Please enter Name, Email, and Phone.")
+    st.success(f"✅ You should file: **{itr_form}**")
+    st.info(f"📦 Recommended Plan: **{plan}**")
