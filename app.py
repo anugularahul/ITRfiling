@@ -4,6 +4,7 @@ st.set_page_config(page_title="ITR Suggestion App", layout="centered")
 st.title("📄 ITR Form & Plan Suggestion App")
 
 # User Inputs
+residency_status = st.radio("Are you an NRI or Indian?", ["Indian", "NRI"])
 salary_income = st.radio("Do you have salary income?", ["Yes", "No"])
 salary_above_50 = st.radio("Is your salary income above ₹50 lakh?", ["Yes", "No"])
 
@@ -16,6 +17,8 @@ multi_property = st.radio("Do you own more than one house property?", ["Yes", "N
 firm_type = st.radio("Are you a partner in a firm (excluding LLP)?", ["Yes", "No"])
 company = st.radio("Is your income from a company?", ["Yes", "No"])
 trust = st.radio("Is your income from a trust or political party?", ["Yes", "No"])
+
+esop_rsu = st.radio("Do you have any ESOPs or RSUs (held or sold)?", ["Yes", "No"])
 
 total_income = st.number_input("Enter your total income (in ₹)", min_value=0, step=1000)
 
@@ -32,7 +35,7 @@ def suggest_itr_form():
             return "ITR-4 (Sugam)"
         else:
             return "ITR-3"
-    elif capital_gains == "Yes" or foreign_assets == "Yes" or multi_property == "Yes":
+    elif capital_gains == "Yes" or foreign_assets == "Yes" or multi_property == "Yes" or esop_rsu == "Yes":
         return "ITR-2"
     elif salary_income == "Yes":
         if salary_above_50 == "Yes":
@@ -45,8 +48,12 @@ def suggest_itr_form():
         return "More details needed."
 
 def suggest_plan(itr_form):
+    # If NRI, always go for BLACK plan
+    if residency_status == "NRI":
+        return "Assisted Filing Black"
+
     # BLACK Plan logic
-    if (foreign_assets == "Yes"):
+    if foreign_assets == "Yes":
         return "Assisted Filing Black"
 
     # LUXURY Plan logic
