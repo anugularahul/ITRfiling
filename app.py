@@ -9,7 +9,6 @@ salary_above_50 = st.radio("Is your salary income above ₹50 lakh?", ["Yes", "N
 
 capital_gains = st.radio("Do you have capital gains (Crypto, FnO, etc)?", ["Yes", "No"])
 business_income = st.radio("Do you have business income?", ["Yes", "No"])
-freelancer = st.radio("Are you a freelancer?", ["Yes", "No"])
 presumptive = st.radio("Are you under presumptive taxation?", ["Yes", "No"])
 
 foreign_assets = st.radio("Do you have foreign income or foreign assets?", ["Yes", "No"])
@@ -28,7 +27,7 @@ def suggest_itr_form():
         return "ITR-6"
     elif firm_type == "Yes":
         return "ITR-5"
-    elif business_income == "Yes" or freelancer == "Yes":
+    elif business_income == "Yes":
         if presumptive == "Yes" and total_income <= 5000000:
             return "ITR-4 (Sugam)"
         else:
