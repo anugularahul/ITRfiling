@@ -46,7 +46,7 @@ def suggest_itr_form():
 
 def suggest_plan(itr_form):
     # BLACK Plan logic
-    if total_income > 5000000:
+    if (business_income == "Yes" and capital_gains == "Yes" and salary_above_50 == "Yes" and multi_property == "Yes" and presumptive == "Yes"):
         return "Assisted Filing Black"
 
     # LUXURY Plan logic
