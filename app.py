@@ -46,7 +46,7 @@ def suggest_itr_form():
 
 def suggest_plan(itr_form):
     # BLACK Plan logic
-    if (business_income == "Yes" and capital_gains == "Yes" and salary_above_50 == "Yes" and multi_property == "Yes" and presumptive == "Yes"):
+     if (business_income == "Yes" and capital_gains == "Yes" and salary_above_50 == "Yes" and multi_property == "Yes" and presumptive == "Yes"):
         return "Assisted Filing Black"
 
     # LUXURY Plan logic
@@ -56,9 +56,9 @@ def suggest_plan(itr_form):
     # BASIC Plan logic
     if (salary_income == "Yes" and salary_above_50 == "No" and multi_property == "No" and business_income == "No"):
         return "Assisted Filing Basic"
-    
+
     # PREMIUM Plan as default
-        return "Assisted Filing Premium"
+    return "Assisted Filing Premium"
 
 # Submit Button
 if st.button("📤 Submit & Get Suggestion"):
