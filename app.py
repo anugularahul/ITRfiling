@@ -57,7 +57,8 @@ def suggest_plan(itr_form):
     if (salary_income == "Yes" and salary_above_50 == "No" and multi_property == "No" and business_income == "No"):
         return "Assisted Filing Basic"
 
-
+    # PREMIUM Plan as default
+        return "Assisted Filing Premium"
 
 # Submit Button
 if st.button("📤 Submit & Get Suggestion"):
